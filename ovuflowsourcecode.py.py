@@ -21,7 +21,7 @@ def calculate_dates(start_date, cycle_length):
     # Calculate the next period date (start date of next cycle)
     next_period = start_date + timedelta(days=cycle_length)
     
-    # Calculate the pregnancy test date (1 day after missed period)
+    # Calculate the pregnancy test date (1 week after missed period)
     pregnancy_test_date = next_period + timedelta(days=7)
     
     # Calculate the due date (estimated 9 months from ovulation)
@@ -33,19 +33,24 @@ def calculate_dates(start_date, cycle_length):
 def plot_hormone_levels(start_date, cycle_length, fertile_windows, health_condition, exercise_level):
     # Simulate hormone levels with adjustments based on health condition and exercise level
     days = np.arange(1, cycle_length + 1)
-    if health_condition == "PCOS":
-        estrogen = np.sin(days / cycle_length * 2 * np.pi) * 0.5 + 0.3
-        progesterone = np.sin((days + 5) / cycle_length * 2 * np.pi) * 0.6 + 0.3
-        lh = np.sin((days + 10) / cycle_length * 2 * np.pi) * 0.5 + 0.5
+    
+    if health_condition == "Normal":
+        # Normal fluctuation with sine and cosine
+        estrogen = np.cos((days - 14) / cycle_length * 2 * np.pi) * 0.7 + 0.5
+        progesterone = np.sin((days - 14) / cycle_length * 2 * np.pi) * 0.7 + 0.5
+        lh = np.cos((days - 12) / cycle_length * 2 * np.pi) * 0.5 + 0.5
+    elif health_condition == "PCOS":
+        # Adjusted fluctuation for PCOS
+        estrogen = np.sin((days - 14) / cycle_length * 2 * np.pi) * 0.6 + 0.4
+        progesterone = np.cos((days - 16) / cycle_length * 2 * np.pi) * 0.6 + 0.4
+        lh = np.sin((days - 18) / cycle_length * 2 * np.pi) * 0.5 + 0.6
     elif health_condition == "Thyroid Issues":
-        estrogen = np.sin(days / cycle_length * 2 * np.pi) * 0.7 + 0.5
-        progesterone = np.sin((days + 5) / cycle_length * 2 * np.pi) * 0.8 + 0.4
-        lh = np.sin((days + 10) / cycle_length * 2 * np.pi) * 0.6 + 0.4
-    else:
-        estrogen = np.sin(days / cycle_length * 2 * np.pi) + 0.5
-        progesterone = np.sin((days + 5) / cycle_length * 2 * np.pi) + 0.5
-        lh = np.sin((days + 10) / cycle_length * 2 * np.pi) + 0.5
+        # Adjusted fluctuation for thyroid issues
+        estrogen = np.cos((days - 14) / cycle_length * 2 * np.pi) * 0.8 + 0.6
+        progesterone = np.sin((days - 15) / cycle_length * 2 * np.pi) * 0.8 + 0.5
+        lh = np.cos((days - 12) / cycle_length * 2 * np.pi) * 0.6 + 0.4
 
+    # Adjust hormone levels based on exercise level
     if exercise_level == "Very Active":
         estrogen *= 0.8
         progesterone *= 0.9
@@ -54,11 +59,11 @@ def plot_hormone_levels(start_date, cycle_length, fertile_windows, health_condit
         estrogen *= 1.2
         progesterone *= 1.1
         lh *= 1.1
-
+    
     # Calculate ovulation day as the number of days since start_date
     ovulation_day = (start_date + timedelta(days=cycle_length - 14) - start_date).days
     
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 6))
     plt.plot(days, estrogen, label=f"Estrogen ({health_condition}, {exercise_level})", color='green')
     plt.plot(days, progesterone, label=f"Progesterone ({health_condition}, {exercise_level})", color='red')
     plt.plot(days, lh, label=f"LH ({health_condition}, {exercise_level})", color='blue')
@@ -224,3 +229,4 @@ calendar_button.pack(pady=10)
 
 # Run the GUI
 root.mainloop()
+
